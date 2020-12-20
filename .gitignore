@@ -1,0 +1,6 @@
+# No agregar al repositorio
+
+*.class
+*.exe
+*.out
+*.o
