@@ -1,25 +1,25 @@
 import java.io.*;
 import java.net.*;
 
-public class ClienteGato{
+public class Client{
 
     private String host;
     private int port;
     private Socket sc;
-    private BufferedReader entrada;
-    private PrintWriter salida;
+    private BufferedReader msgIn;
+    private PrintWriter msgOut;
 
-    public ClienteGato(){
+    public Client(){
         port = 1234;
         host = "localhost";
     }
 
-    public ClienteGato(int p){
+    public Client(int p){
         port = p;
         host = "localhost";
     }
 
-    public ClienteGato(String h, int p){
+    public Client(String h, int p){
         host = h;
         port = p;
     }
@@ -33,26 +33,25 @@ public class ClienteGato{
         }
     }
 
-    public void correrCliente() throws IOException{
+    public void runClient() throws IOException{
         try {
-            // Obtenemos el canal de entrada
-            entrada = new BufferedReader(new InputStreamReader(sc.getInputStream()));
+            // Obtenemos el canal de msgIn
+            msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
             
-            // Obtenemos el canal de salida
-            salida = new PrintWriter(new BufferedWriter(new 
+            // Obtenemos el canal de msgOut
+            msgOut = new PrintWriter(new BufferedWriter(new 
             OutputStreamWriter(sc.getOutputStream())),true);
         }catch (IOException e){
             System.err.println("No puede establer canales de E/S para la conexión");
             System.exit(0);
         }
-        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
         String linea;
 
         try {
             while(true){
-                // Envía a la salida estándar la respuesta del servidor
-                linea = entrada.readLine();
+                // Envía a la msgOut estándar la respuesta del servidor
+                linea = msgIn.readLine();
                 if(linea.equals("exit")) break;
                 System.out.println("Respuesta del servidor: " + linea);
             }
@@ -61,18 +60,18 @@ public class ClienteGato{
         }
 
         // Libera recursos
-        salida.close();
-        entrada.close();
+        msgOut.close();
+        msgIn.close();
     }
 
-    public void cerrar() throws IOException{
+    public void close() throws IOException{
         sc.close();
     }
 
     public static void main(String[] args)  throws IOException{
-        ClienteGato c = new ClienteGato();
+        Client c = new Client();
         c.init();
-        c.correrCliente();
-        c.cerrar();
+        c.runClient();
+        c.close();
     }
 }
