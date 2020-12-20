@@ -3,10 +3,10 @@ import java.util.Scanner;
 
 public class Game {
     public char [][]board = {{'-','-','-'},{'-','-','-'},{'-','-','-'}};
-    private char []symbols = {'X','O'};
-    private boolean turn = true;
+    private boolean turn = true, endgame = false;
     private Scanner scan = new Scanner(System.in);
     private Semaphore canPlay = new Semaphore(1, true);
+    private String winner = "";
 
     public void printBoard(){
         System.out.print("  ");
@@ -17,28 +17,28 @@ public class Game {
         for(int i=0; i<3; i++){
             System.out.print(i+" ");
             for(int j=0; j<3; j++){
-                System.out.print(tablero[i][j]+" ");
+                System.out.print(board[i][j]+" ");
             }
             System.out.println();
         }
     }
 
-    public boolean isWinner(){
-        if(tablero[0][0] == signo[jugador-1] && tablero[1][1] == signo[jugador-1] && tablero[2][2] == signo[jugador-1]){
+    public boolean isWinner(char mark){
+        if(board[0][0] == mark && board[1][1] == mark && board[2][2] == mark){
             return true;
-        }else if(tablero[2][0] == signo[jugador-1] && tablero[1][1] == signo[jugador-1] && tablero[0][2] == signo[jugador-1]){
+        }else if(board[2][0] == mark && board[1][1] == mark && board[0][2] == mark){
             return true;
-        }else if(tablero[0][0] == signo[jugador-1] && tablero[0][1] == signo[jugador-1] && tablero[0][2] == signo[jugador-1]){
+        }else if(board[0][0] == mark && board[0][1] == mark && board[0][2] == mark){
             return true;
-        }else if(tablero[1][0] == signo[jugador-1] && tablero[1][1] == signo[jugador-1] && tablero[1][2] == signo[jugador-1]){
+        }else if(board[1][0] == mark && board[1][1] == mark && board[1][2] == mark){
             return true;
-        }else if(tablero[2][0] == signo[jugador-1] && tablero[2][1] == signo[jugador-1] && tablero[2][2] == signo[jugador-1]){
+        }else if(board[2][0] == mark && board[2][1] == mark && board[2][2] == mark){
             return true;
-        }else if(tablero[0][0] == signo[jugador-1] && tablero[1][0] == signo[jugador-1] && tablero[2][0] == signo[jugador-1]){
+        }else if(board[0][0] == mark && board[1][0] == mark && board[2][0] == mark){
             return true;
-        }else if(tablero[0][1] == signo[jugador-1] && tablero[1][1] == signo[jugador-1] && tablero[2][1] == signo[jugador-1]){
+        }else if(board[0][1] == mark && board[1][1] == mark && board[2][1] == mark){
             return true;
-        }else if(tablero[0][2] == signo[jugador-1] && tablero[1][2] == signo[jugador-1] && tablero[2][2] == signo[jugador-1]){
+        }else if(board[0][2] == mark && board[1][2] == mark && board[2][2] == mark){
             return true;
         }
         else{
@@ -46,38 +46,41 @@ public class Game {
         }
     }
 
-    public void verificarTirada(int x, int y){
-        if(tablero[x][y] != '-'){
+    public void verificarTirada(int x, int y, String mark){
+        if(board[x][y] != '-'){
             System.out.println("Lugar ocupado, intente de nuevo.");
+            play(mark);
         }else{
-            tablero[x][y] = signo[jugador-1];
-            if(isWinner()){
-                System.out.println("El jugador "+jugador+" ha ganado.");
-                juego = false;
-            }else{
-                if(turno) jugador = 2;
-                else jugador = 1;
-                turno = !turno;
+            board[x][y] = mark.charAt(0);
+            if(isWinner(mark.charAt(0))){
+                printBoard();
+                System.out.println("Haz ganado marca "+mark+".");
+                winner = mark;
+                endgame = true;
             }
         }
     }
 
-    public void play(String xy){
+    public void play(String mark){
+        System.out.println("\nTurno del jugador "+mark);
+        printBoard();
+        System.out.print("Ponga una coordenada para tirar: ");
+        String xy = scan.nextLine();
+        if(xy.equals("exit")) System.exit(-1);
         String[] c = xy.split(",");
-        verificarTirada(Integer.parseInt(c[0]),Integer.parseInt(c[1]));
+        verificarTirada(Integer.parseInt(c[0]),Integer.parseInt(c[1]),mark);
     }
 
-    public void runGame(){
-        while(juego){
-            System.out.println("Turno del jugador "+jugador);
-            this.printBoard();
-            System.out.print("Ponga una coordenada para tirar: ");
-            String xy = teclado.nextLine();
-            if(xy.equals("exit")) System.exit(0);
-            this.tirar(xy);
+    public boolean runGame(String mark) throws InterruptedException{
+        canPlay.acquire();
+        if(!endgame){
+            play(mark);
+        }else{
+            System.out.println("El jugador "+winner+" ha ganado.");
+            printBoard();
         }
-        printBoard();
-        System.out.println("Fin del juego");
+        canPlay.release();
+        return endgame;
     }
 
 }
