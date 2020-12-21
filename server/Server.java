@@ -32,27 +32,34 @@ public class Server{
         }
     }
 
+    public void initGame() throws IOException{
+        for(PlayerThread hj : players){
+            hj.sendSymbol();
+            hj.sendMsg("exit");
+        }
+    }
+
     public void listen() throws IOException{
         System.out.println("Esperando jugadores");
         try {
-            while(numPlayers < 2){
+            while(true){
                 // Wait a response from the client
                 sc = ss.accept();
                 System.out.println("Conexion aceptada: "+ sc);
-                players.add(new PlayerThread(sc,symbol[numPlayers]));
                 // Create an out buffer
                 msgOut = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(
                     sc.getOutputStream())),true);
-                if(numPlayers < 1) msgOut.println("Esperando a otro jugador");
-                numPlayers++;
+                if(numPlayers >= 2){
+                    msgOut.println("Suficientes jugadores en el juego");
+                    msgOut.println("exit");
+                }else{
+                    players.add(new PlayerThread(sc,symbol[numPlayers]));
+                    numPlayers++;
+                    if(numPlayers == 1) msgOut.println("Esperando a otro jugador");
+                    if(numPlayers == 2) initGame();
+                }
             }
-
-            for(PlayerThread hj : players){
-                hj.sendSymbol();
-                hj.sendMsg("exit");
-            }
-
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         }
