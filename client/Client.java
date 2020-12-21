@@ -34,6 +34,7 @@ public class Client{
     }
 
     public void runClient() throws IOException{
+        boolean go = true;
         try {
             // Obtenemos el canal de msgIn
             msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
@@ -49,11 +50,16 @@ public class Client{
         String linea;
 
         try {
-            while(true){
-                // Envía a la msgOut estándar la respuesta del servidor
+            while(go){
                 linea = msgIn.readLine();
-                if(linea.equals("exit")) break;
-                System.out.println("Respuesta del servidor: " + linea);
+                switch (linea) {
+                    case "exit":
+                        go = false;
+                    break;
+                    default:
+                        System.out.println("Respuesta del servidor: " + linea);
+                    break;
+                }                
             }
         }catch (IOException e){
             System.out.println("IOException: " + e.getMessage());
