@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 public class Client{
 
@@ -8,6 +9,7 @@ public class Client{
     private Socket sc;
     private BufferedReader msgIn;
     private PrintWriter msgOut;
+    public Scanner scan = new Scanner(System.in);
 
     public Client(){
         port = 1234;
@@ -56,8 +58,13 @@ public class Client{
                     case "exit":
                         go = false;
                     break;
+                    case "name":
+                        String n = scan.nextLine();
+                        msgOut.println(n);
+                    break;
                     default:
-                        System.out.println("Respuesta del servidor: " + linea);
+                        // Respuesta del servidor
+                        System.out.println(linea);
                     break;
                 }                
             }
