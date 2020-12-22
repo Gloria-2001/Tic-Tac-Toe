@@ -1,6 +1,6 @@
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Server{
     private int port;
@@ -10,11 +10,13 @@ public class Server{
     private PrintWriter msgOut;
     private int numPlayers = 0;
     private ArrayList<PlayerThread> players;
+    private Stack<PlayerThread> playRemove;
     private char []symbol = {'X','O'};
 
     public Server(){
         port = 1234;
         players = new ArrayList<PlayerThread>();
+        playRemove = new Stack<PlayerThread>();
     }
 
     public Server(int p){
@@ -33,9 +35,29 @@ public class Server{
     }
 
     public void initGame() throws IOException{
+        TicTacToe g = new TicTacToe();
         for(PlayerThread hj : players){
+            hj.initPlayer(g);
             hj.sendSymbol();
-            hj.sendMsg("exit");
+            hj.start();
+        }
+
+        while(true){
+            for(PlayerThread hj : players){
+                if(!hj.isAlive()){
+                    playRemove.push(hj);
+                }
+            }
+            
+            while(!playRemove.empty()){
+                players.remove(playRemove.pop());
+            }
+
+            if(players.isEmpty()){
+                numPlayers = 0;
+                System.out.println("Pueden ingresar nuevos jugadores");
+                break;
+            }
         }
     }
 
@@ -50,11 +72,15 @@ public class Server{
                 msgOut = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(
                     sc.getOutputStream())),true);
+                msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
                 if(numPlayers >= 2){
                     msgOut.println("Suficientes jugadores en el juego");
                     msgOut.println("exit");
                 }else{
-                    players.add(new PlayerThread(sc,symbol[numPlayers]));
+                    msgOut.println("Ingrese un nombre: ");
+                    msgOut.println("name");
+                    String name = msgIn.readLine();
+                    players.add(new PlayerThread(sc,symbol[numPlayers],name));
                     numPlayers++;
                     if(numPlayers == 1) msgOut.println("Esperando a otro jugador");
                     if(numPlayers == 2) initGame();
@@ -64,6 +90,7 @@ public class Server{
             System.out.println("IOException: " + e.getMessage());
         }
         msgOut.close();
+        msgIn.close();
     }
 
     public void close() throws IOException{
