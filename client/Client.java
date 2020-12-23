@@ -59,8 +59,14 @@ public class Client{
                         go = false;
                     break;
                     case "name":
-                        String n = scan.nextLine();
-                        msgOut.println(n);
+                        // Ingresa un nombre
+                        linea = scan.nextLine();
+                        msgOut.println(linea);
+                    break;
+                    case "doMark":
+                        // Da coordeandas para tirar
+                        linea = scan.nextLine();
+                        msgOut.println(linea);
                     break;
                     default:
                         // Respuesta del servidor
