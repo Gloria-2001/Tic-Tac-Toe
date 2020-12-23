@@ -40,7 +40,8 @@ public class PlayerThread extends Thread{
     }
 
     public String reciveMsg() throws IOException{
-        return msgIn.readLine();
+        String msg = msgIn.readLine();
+        return msg;
     }
 
     public char getSymbol(){

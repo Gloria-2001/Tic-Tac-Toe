@@ -1,26 +1,30 @@
 import java.util.concurrent.Semaphore;
 import java.util.Scanner;
+import java.io.*;
 
 public class TicTacToe {
     public char [][]board = {{'-','-','-'},{'-','-','-'},{'-','-','-'}};
     private boolean turn = true, endgame = false;
     private Scanner scan = new Scanner(System.in);
     private Semaphore canPlay = new Semaphore(1, true);
-    private String winner = "";
+    private PlayerThread winner = null;
 
-    public void printBoard(){
-        System.out.print("  ");
+    public String printBoard(){
+        String strBoard = "  ";
+        
         for(int i=0; i<3; i++){
-            System.out.print(i+" ");
+           strBoard += String.valueOf(i)+" ";
         }
-        System.out.println();
+        strBoard += "\n";
         for(int i=0; i<3; i++){
-            System.out.print(i+" ");
+            strBoard += String.valueOf(i)+" ";
             for(int j=0; j<3; j++){
-                System.out.print(board[i][j]+" ");
+                strBoard += String.valueOf(board[i][j])+" ";
             }
-            System.out.println();
+            strBoard += "\n";
         }
+
+        return strBoard;
     }
 
     public boolean isWinner(char mark){
@@ -46,47 +50,51 @@ public class TicTacToe {
         }
     }
 
-    public void verificarTirada(int x, int y, String mark){
+    public void verificarTirada(int x, int y, PlayerThread p) throws IOException{
         if(board[x][y] != '-'){
-            System.out.println("Lugar ocupado, intente de nuevo.");
-            play(mark);
+            p.sendMsg("Lugar ocupado, intente de nuevo.");
+            play(p);
         }else{
-            board[x][y] = mark.charAt(0);
-            if(isWinner(mark.charAt(0))){
-                printBoard();
-                System.out.println("Haz ganado marca "+mark+".");
-                winner = mark;
+            board[x][y] = p.getSymbol();
+            p.sendMsg(printBoard());
+            if(isWinner(p.getSymbol())){
+                p.sendMsg("Haz ganado "+p.getName());
+                winner = p;
                 endgame = true;
+                p.sendMsg("exit");
             }
         }
     }
 
-    public void play(String mark){
-        System.out.println("\nTurno del jugador "+mark);
-        printBoard();
-        System.out.print("Ponga una coordenada para tirar: ");
-        String xy = scan.nextLine();
-        if(xy.equals("exit")) System.exit(-1);
+    public void play(PlayerThread p) throws IOException{
+        System.out.println("\nTurno de "+p.getName());
+        p.sendMsg("\nTurno de "+p.getName());
+        p.sendMsg(printBoard());
+        p.sendMsg("Ponga una coordenada para tirar: ");
+        p.sendMsg("doMark");
+        String xy = p.reciveMsg();
+        System.out.println("Se ingreso "+xy);
+        if(xy.equals("exit")) endgame=true;
         String[] c = xy.split(",");
-        verificarTirada(Integer.parseInt(c[0]),Integer.parseInt(c[1]),mark);
+        verificarTirada(Integer.parseInt(c[0]),Integer.parseInt(c[1]),p);
     }
 
     public boolean runGame(PlayerThread p) throws InterruptedException{
-        canPlay.acquire();
         try {
-            System.out.println("Entro al juego "+p.getName());
-            p.sendMsg("exit");
+            p.sendMsg("Espear tu turno");
+            canPlay.acquire();
+            if(!endgame){
+                play(p);
+            }else{
+                p.sendMsg("El jugador "+winner.getName()+" ha ganado");
+                p.sendMsg(printBoard());
+                p.sendMsg("exit");
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
-        // if(!endgame){
-        //     play(mark);
-        // }else{
-        //     System.out.println("El jugador "+winner+" ha ganado.");
-        //     printBoard();
-        // }
         canPlay.release();
-        return true;
+        return endgame;
     }
 
 }
