@@ -3,7 +3,6 @@ import java.net.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 public class Client extends JFrame implements ActionListener{
@@ -13,10 +12,11 @@ public class Client extends JFrame implements ActionListener{
     private Socket sc;
     private BufferedReader msgIn;
     private PrintWriter msgOut;
-    public Scanner scan = new Scanner(System.in);
     private Container cp;
     private GridLayout gl;
-    private Label l00;
+    private JLabel l00;
+    private String mark,tiro;
+    private boolean turno = false;
 
     public Client(){
         super("Tic Tac Toe");
@@ -61,8 +61,8 @@ public class Client extends JFrame implements ActionListener{
     public void crearBarra(){
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
-        panel.add(new Label(name));
-        l00 = new Label("Espera tu turno");
+        panel.add(new JLabel(name));
+        l00 = new JLabel("Espera tu turno");
         panel.add(l00);
         cp.add(panel,BorderLayout.NORTH);
     }
@@ -73,15 +73,13 @@ public class Client extends JFrame implements ActionListener{
         // this.no.setActionCommand("Cancelar");
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
-                JButton b = new JButton("");
+                JButton b = new JButton();
                 b.setActionCommand(i+","+j);
+                b.setFont(new Font("Serif", Font.BOLD, 30));
                 b.addActionListener(this);
                 panel.add(b);
             }
         }
-        // for(int i=1; i<=9; i++){
-        //     panel.add(new JButton(String.valueOf(i)));
-        // }
         cp.add(panel,BorderLayout.CENTER);
     }
 
@@ -100,12 +98,11 @@ public class Client extends JFrame implements ActionListener{
         }
 
         String linea;
-        this.setVisible(true);
+        // this.setVisible(true);
 
         try {
             while(go){
                 linea = msgIn.readLine();
-                System.out.println(linea);
                 switch (linea) {
                     case "exit":
                         go = false;
@@ -116,14 +113,20 @@ public class Client extends JFrame implements ActionListener{
                     break;
                     case "doMark":
                         // Da coordeandas para tirar
-                        linea = scan.nextLine();
-                        msgOut.println(linea);
+                        l00.setText("Es tu turno");
+                        turno = true;
                     break;
                     case "w00":
-                        JOptionPane.showMessageDialog(null, "Experando a otro jugador", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Esperando a otro jugador, de aceptar y espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                    case "wait":
+                        l00.setText("Espera tu turno");
                     break;
                     case "play":
-                        // this.setVisible(true);
+                        setVisible(true);
+                    break;
+                    case "sym":
+                        this.mark = msgIn.readLine();
                     break;
                     default:
                         // Respuesta del servidor
@@ -143,7 +146,14 @@ public class Client extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e){
         // e.getSource() se compara con la instancia de la clase
-        System.out.println(e.getActionCommand());
+        if(turno){
+            tiro = e.getActionCommand();
+            System.out.println(tiro);
+            msgOut.println(tiro);
+        }else{
+            JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+        }
+        turno = false;
     }
 
     public void close() throws IOException{

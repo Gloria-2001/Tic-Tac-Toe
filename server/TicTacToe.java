@@ -66,10 +66,9 @@ public class TicTacToe {
 
     public void play(PlayerThread p) throws IOException{
         System.out.println("\nTurno de "+p.getName());
-        p.sendMsg("\nTurno de "+p.getName());
         p.sendMsg(printBoard());
-        p.sendMsg("Ponga una coordenada para tirar: ");
         p.sendMsg("doMark");
+        p.sendMsg("Ponga una coordenada para tirar: ");
         String xy = p.reciveMsg();
         System.out.println("Se ingreso "+xy);
         if(xy.equals("exit")) endgame=true;
@@ -79,7 +78,7 @@ public class TicTacToe {
 
     public boolean runGame(PlayerThread p) throws InterruptedException{
         try {
-            p.sendMsg("Espear tu turno");
+            p.sendMsg("wait");
             canPlay.acquire();
             if(!endgame){
                 play(p);

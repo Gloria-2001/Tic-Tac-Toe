@@ -32,7 +32,8 @@ public class PlayerThread extends Thread{
     }
 
     public void sendSymbol() throws IOException{
-        msgOut.println("Tu marca es "+ symbol);
+        msgOut.println("sym");
+        msgOut.println(String.valueOf(symbol));
     }
 
     public void sendMsg(String msg) throws IOException{
