@@ -1,11 +1,9 @@
 import java.util.concurrent.Semaphore;
-import java.util.Scanner;
 import java.io.*;
 
 public class TicTacToe {
     public char [][]board = {{'-','-','-'},{'-','-','-'},{'-','-','-'}};
-    private boolean turn = true, endgame = false;
-    private Scanner scan = new Scanner(System.in);
+    private boolean endgame = false;
     private Semaphore canPlay = new Semaphore(1, true);
     private PlayerThread winner = null;
 
@@ -86,7 +84,7 @@ public class TicTacToe {
             if(!endgame){
                 play(p);
             }else{
-                p.sendMsg("El jugador "+winner.getName()+" ha ganado");
+                p.sendMsg(winner.getName()+" ha ganado");
                 p.sendMsg(printBoard());
                 p.sendMsg("exit");
             }

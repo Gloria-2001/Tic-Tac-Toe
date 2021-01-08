@@ -39,6 +39,7 @@ public class Server{
         for(PlayerThread hj : players){
             hj.initPlayer(g);
             hj.sendSymbol();
+            hj.sendMsg("play");
             hj.start();
         }
 
@@ -77,12 +78,13 @@ public class Server{
                     msgOut.println("Suficientes jugadores en el juego");
                     msgOut.println("exit");
                 }else{
-                    msgOut.println("Ingrese un nombre: ");
                     msgOut.println("name");
                     String name = msgIn.readLine();
                     players.add(new PlayerThread(sc,symbol[numPlayers],name));
                     numPlayers++;
-                    if(numPlayers == 1) msgOut.println("Esperando a otro jugador");
+                    if(numPlayers == 1){
+                        msgOut.println("w00");
+                    }
                     if(numPlayers == 2) initGame();
                 }
             }
