@@ -3,6 +3,7 @@ import java.net.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 
 public class Client extends JFrame implements ActionListener{
@@ -17,6 +18,7 @@ public class Client extends JFrame implements ActionListener{
     private JLabel l00;
     private String mark,tiro;
     private boolean turno = false;
+    private HashMap<String, JButton> table;
 
     public Client(){
         super("Tic Tac Toe");
@@ -45,6 +47,7 @@ public class Client extends JFrame implements ActionListener{
             this.cp = getContentPane();
             this.gl = new GridLayout(3,3);
             gl.setHgap(5);  gl.setVgap(5);
+            table = new HashMap<String,JButton>();
             name = JOptionPane.showInputDialog(null, "Ingrese su nombre", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
             this.initGUI();
         } catch (Exception e) {
@@ -77,6 +80,7 @@ public class Client extends JFrame implements ActionListener{
                 b.setActionCommand(i+","+j);
                 b.setFont(new Font("Serif", Font.BOLD, 30));
                 b.addActionListener(this);
+                table.put(i+","+j,b);
                 panel.add(b);
             }
         }
@@ -85,6 +89,7 @@ public class Client extends JFrame implements ActionListener{
 
     public void runClient() throws IOException{
         boolean go = true;
+        mark = "";
         try {
             // Obtenemos el canal de msgIn
             msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
@@ -149,6 +154,8 @@ public class Client extends JFrame implements ActionListener{
         if(turno){
             tiro = e.getActionCommand();
             System.out.println(tiro);
+            JButton b = table.get(tiro);
+            b.setText(mark);
             msgOut.println(tiro);
         }else{
             JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
