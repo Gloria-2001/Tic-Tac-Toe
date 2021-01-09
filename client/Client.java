@@ -78,7 +78,7 @@ public class Client extends JFrame implements ActionListener{
             for(int j=0; j<3; j++){
                 JButton b = new JButton();
                 b.setActionCommand(i+","+j);
-                b.setFont(new Font("Serif", Font.BOLD, 30));
+                b.setFont(new Font("Serif", Font.BOLD, 50));
                 b.addActionListener(this);
                 table.put(i+","+j,b);
                 panel.add(b);
@@ -110,6 +110,7 @@ public class Client extends JFrame implements ActionListener{
                 linea = msgIn.readLine();
                 switch (linea) {
                     case "exit":
+                        System.out.println("Adios");
                         go = false;
                     break;
                     case "name":
@@ -133,6 +134,19 @@ public class Client extends JFrame implements ActionListener{
                     case "sym":
                         this.mark = msgIn.readLine();
                     break;
+                    case "last":
+                        lastMark();
+                    break;
+                    case "tie":
+                        JOptionPane.showMessageDialog(null, "Es un empate", "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
+                    break;
+                    case "win":
+                        JOptionPane.showMessageDialog(null, "Felicidades "+name+".\n¡Haz ganado!", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                    case "lose":
+                        linea = msgIn.readLine();
+                        JOptionPane.showMessageDialog(null, "Lo sentimos\n"+linea+" ha ganado", "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
+                    break;
                     default:
                         // Respuesta del servidor
                         System.out.println(linea);
@@ -146,6 +160,8 @@ public class Client extends JFrame implements ActionListener{
         // Libera recursos
         msgOut.close();
         msgIn.close();
+        close();
+        System.exit(0);
     }
 
     @Override
@@ -156,11 +172,23 @@ public class Client extends JFrame implements ActionListener{
             System.out.println(tiro);
             JButton b = table.get(tiro);
             b.setText(mark);
+            b.setForeground(Color.red);
             msgOut.println(tiro);
         }else{
             JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
         }
         turno = false;
+    }
+
+    public void lastMark(){
+        try {
+            String m = msgIn.readLine();    // Marca
+            String c = msgIn.readLine();    // Coordeanda
+            JButton b = table.get(c);
+            b.setText(m);   
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     public void close() throws IOException{
@@ -171,6 +199,5 @@ public class Client extends JFrame implements ActionListener{
         Client c = new Client();
         c.init();
         c.runClient();
-        c.close();
     }
 }

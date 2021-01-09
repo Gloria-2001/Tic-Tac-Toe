@@ -6,6 +6,8 @@ public class TicTacToe {
     private boolean endgame = false;
     private Semaphore canPlay = new Semaphore(1, true);
     private PlayerThread winner = null;
+    private String lastMark = "", coord = "";
+    private boolean firstTime = true, tie = false;
 
     public String printBoard(){
         String strBoard = "  ";
@@ -25,7 +27,7 @@ public class TicTacToe {
         return strBoard;
     }
 
-    public boolean isWinner(char mark){
+    private boolean isWinner(char mark){
         if(board[0][0] == mark && board[1][1] == mark && board[2][2] == mark){
             return true;
         }else if(board[2][0] == mark && board[1][1] == mark && board[0][2] == mark){
@@ -47,6 +49,13 @@ public class TicTacToe {
             return false;
         }
     }
+    
+    private boolean isTie(){
+        for(int i=0; i<3; i++)
+            for(int j=0; j<3; j++)
+                if(board[i][j]=='-') return false;
+        return true;
+    }
 
     public void verificarTirada(int x, int y, PlayerThread p) throws IOException{
         if(board[x][y] != '-'){
@@ -54,26 +63,39 @@ public class TicTacToe {
             play(p);
         }else{
             board[x][y] = p.getSymbol();
-            p.sendMsg(printBoard());
+            lastMark = String.valueOf(p.getSymbol());
             if(isWinner(p.getSymbol())){
-                p.sendMsg("Haz ganado "+p.getName());
+                System.out.print("Ha ganado"+p.getName());
+                p.sendMsg("win");
                 winner = p;
                 endgame = true;
                 p.sendMsg("exit");
+            }else if(isTie()){
+                p.sendMsg("tie");
+                p.sendMsg("exit");
+                endgame = true;
+                tie = true;
             }
         }
+        System.out.println(printBoard());
     }
 
     public void play(PlayerThread p) throws IOException{
         System.out.println("\nTurno de "+p.getName());
-        p.sendMsg(printBoard());
+        //p.sendMsg(printBoard());
         p.sendMsg("doMark");
-        p.sendMsg("Ponga una coordenada para tirar: ");
         String xy = p.reciveMsg();
         System.out.println("Se ingreso "+xy);
         if(xy.equals("exit")) endgame=true;
+        coord = xy;
         String[] c = xy.split(",");
         verificarTirada(Integer.parseInt(c[0]),Integer.parseInt(c[1]),p);
+    }
+
+    public void sendLast(PlayerThread p) throws IOException{
+        p.sendMsg("last");
+        p.sendMsg(lastMark);
+        p.sendMsg(coord);
     }
 
     public boolean runGame(PlayerThread p) throws InterruptedException{
@@ -81,11 +103,21 @@ public class TicTacToe {
             p.sendMsg("wait");
             canPlay.acquire();
             if(!endgame){
+                if(!firstTime){
+                    sendLast(p);
+                }
+                firstTime = false;
                 play(p);
             }else{
-                p.sendMsg(winner.getName()+" ha ganado");
-                p.sendMsg(printBoard());
-                p.sendMsg("exit");
+                if(!tie){
+                    sendLast(p);
+                    p.sendMsg("lose");
+                    p.sendMsg(winner.getName());
+                    p.sendMsg("exit");
+                }else{
+                    p.sendMsg("tie");
+                    p.sendMsg("exit");
+                }
             }
         } catch (Exception e) {
             System.out.println(e);
