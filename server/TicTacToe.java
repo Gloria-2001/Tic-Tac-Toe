@@ -65,7 +65,7 @@ public class TicTacToe {
             board[x][y] = p.getSymbol();
             lastMark = String.valueOf(p.getSymbol());
             if(isWinner(p.getSymbol())){
-                System.out.print("Ha ganado"+p.getName());
+                System.out.println("Ha ganado "+p.getName());
                 p.sendMsg("win");
                 winner = p;
                 endgame = true;
@@ -115,6 +115,7 @@ public class TicTacToe {
                     p.sendMsg(winner.getName());
                     p.sendMsg("exit");
                 }else{
+                    sendLast(p);
                     p.sendMsg("tie");
                     p.sendMsg("exit");
                 }

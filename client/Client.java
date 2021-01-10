@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 
 public class Client extends JFrame implements ActionListener{
 
-    private String host,name;
+    private String host, name, mark, tiro;
     private int port;
     private Socket sc;
     private BufferedReader msgIn;
@@ -16,7 +16,6 @@ public class Client extends JFrame implements ActionListener{
     private Container cp;
     private GridLayout gl;
     private JLabel l00;
-    private String mark,tiro;
     private boolean turno = false;
     private HashMap<String, JButton> table;
 
@@ -49,7 +48,7 @@ public class Client extends JFrame implements ActionListener{
             gl.setHgap(5);  gl.setVgap(5);
             table = new HashMap<String,JButton>();
             name = JOptionPane.showInputDialog(null, "Ingrese su nombre", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
-            this.initGUI();
+            initGUI();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(0);
@@ -65,7 +64,7 @@ public class Client extends JFrame implements ActionListener{
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
         panel.add(new JLabel(name));
-        l00 = new JLabel("Espera tu turno");
+        l00 = new JLabel("espera tu turno");
         panel.add(l00);
         cp.add(panel,BorderLayout.NORTH);
     }
@@ -78,7 +77,7 @@ public class Client extends JFrame implements ActionListener{
             for(int j=0; j<3; j++){
                 JButton b = new JButton();
                 b.setActionCommand(i+","+j);
-                b.setFont(new Font("Serif", Font.BOLD, 50));
+                b.setFont(new Font("Serif", Font.BOLD, 70));
                 b.addActionListener(this);
                 table.put(i+","+j,b);
                 panel.add(b);
@@ -107,45 +106,44 @@ public class Client extends JFrame implements ActionListener{
 
         try {
             while(go){
+                // Lee mensaje recibido del servidor
                 linea = msgIn.readLine();
                 switch (linea) {
-                    case "exit":
-                        System.out.println("Adios");
+                    case "exit":    // Salida del juego
+                        System.out.println("Fin del juego");
                         go = false;
                     break;
-                    case "name":
-                        // Ingresa un nombre
+                    case "name":    // Nombre del jugador
                         msgOut.println(name);
                     break;
-                    case "doMark":
-                        // Da coordeandas para tirar
-                        l00.setText("Es tu turno");
+                    case "doMark":  // Obtener corrdenadas de la tirada
+                        l00.setText("es tu turno");
                         turno = true;
                     break;
-                    case "w00":
-                        JOptionPane.showMessageDialog(null, "Esperando a otro jugador, de aceptar y espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                    case "w00":     // Espera del otro jugador
+                        JOptionPane.showMessageDialog(null, "Esperando a otro jugador, de clic en aceptar y espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
                     break;
-                    case "wait":
-                        l00.setText("Espera tu turno");
+                    case "wait":    // Espera su turno para tirar
+                        l00.setText("espera tu turno");
                     break;
-                    case "play":
+                    case "play":    // Inicio del juego y visualización del tablero
                         setVisible(true);
                     break;
-                    case "sym":
+                    case "sym":     // Marca del jugador (X / O)
                         this.mark = msgIn.readLine();
                     break;
-                    case "last":
+                    case "last":    // Ultima tirada del jugador contrario
                         lastMark();
                     break;
-                    case "tie":
+                    case "tie":     // Menciona que es un empate
                         JOptionPane.showMessageDialog(null, "Es un empate", "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
                     break;
-                    case "win":
+                    case "win":     // Menciona que el jugador ha ganado
                         JOptionPane.showMessageDialog(null, "Felicidades "+name+".\n¡Haz ganado!", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
                     break;
-                    case "lose":
+                    case "lose":    // Menciona que el jugador ha perdido
                         linea = msgIn.readLine();
-                        JOptionPane.showMessageDialog(null, "Lo sentimos\n"+linea+" ha ganado", "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Lo sentimos.\n"+linea+" ha ganado.", "Tic Tac Toe", JOptionPane.ERROR_MESSAGE);
                     break;
                     default:
                         // Respuesta del servidor
@@ -164,20 +162,29 @@ public class Client extends JFrame implements ActionListener{
         System.exit(0);
     }
 
+    public boolean ocupado(String btext){
+        if(btext.equals("X") || btext.equals("O"))
+            return true;
+        return false;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e){
         // e.getSource() se compara con la instancia de la clase
         if(turno){
             tiro = e.getActionCommand();
-            System.out.println(tiro);
             JButton b = table.get(tiro);
-            b.setText(mark);
-            b.setForeground(Color.red);
-            msgOut.println(tiro);
+            if(!ocupado(b.getText())){
+                b.setText(mark);
+                b.setForeground(Color.red);
+                msgOut.println(tiro);
+                turno = false;
+            }else{
+                JOptionPane.showMessageDialog(null, "Lugar ocupado, seleccione otro", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+            }
         }else{
             JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
         }
-        turno = false;
     }
 
     public void lastMark(){
