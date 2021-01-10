@@ -72,7 +72,6 @@ public class Client extends JFrame implements ActionListener{
     public void crearBotones(){
         JPanel panel = new JPanel();
         panel.setLayout(this.gl);
-        // this.no.setActionCommand("Cancelar");
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
                 JButton b = new JButton();
