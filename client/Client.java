@@ -85,8 +85,24 @@ public class Client extends JFrame implements ActionListener{
         cp.add(panel,BorderLayout.CENTER);
     }
 
+    public void resetGame(){
+        try{
+            sc = new Socket(host,port); //Socket para el cliente
+            for(String key : table.keySet()){
+                JButton b = table.get(key);
+                b.setText("");
+                b.setForeground(Color.black);
+            }
+            l00.setText("espera tu turno");
+            runClient();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void runClient() throws IOException{
         boolean go = true;
+        int reset = -1;
         mark = "";
         try {
             // Obtenemos el canal de msgIn
@@ -101,7 +117,6 @@ public class Client extends JFrame implements ActionListener{
         }
 
         String linea;
-        // this.setVisible(true);
 
         try {
             while(go){
@@ -127,6 +142,7 @@ public class Client extends JFrame implements ActionListener{
                     break;
                     case "play":    // Inicio del juego y visualización del tablero
                         setVisible(true);
+                        JOptionPane.showMessageDialog(null, "A jugar, "+name+"; te diremos cuando sea tu turno", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
                     break;
                     case "sym":     // Marca del jugador (X / O)
                         this.mark = msgIn.readLine();
@@ -158,6 +174,11 @@ public class Client extends JFrame implements ActionListener{
         msgOut.close();
         msgIn.close();
         close();
+        reset = JOptionPane.showConfirmDialog(null, "¿Deseas jugar de nuevo, "+name+"?", "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if(reset == 0){
+            resetGame();
+        }
+        JOptionPane.showMessageDialog(null, "Fin del juego.\nHasta pronto.", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
         System.exit(0);
     }
 
