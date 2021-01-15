@@ -106,12 +106,13 @@ public class Client extends JFrame implements ActionListener{
     public void resetGame(){
         try{
             sc = new Socket(host,port); //Socket para el cliente
+            // Limpiar el tablero
             for(String key : table.keySet()){
-                JButton b = table.get(key);
-                b.setText("");
-                b.setForeground(Color.black);
+                JButton b = table.get(key); // Obtener el boton el tablero
+                b.setText("");  // Voy a limpiarlod
+                b.setForeground(Color.black);   // Volverlo a poner de negro
             }
-            l00.setText("espera tu turno");
+            l00.setText("espera tu turno"); // Espere el turno
             runClient();
         }catch(Exception e){
             System.out.println(e.getMessage());
@@ -195,6 +196,10 @@ public class Client extends JFrame implements ActionListener{
         msgIn.close();
         close();
         reset = JOptionPane.showConfirmDialog(null, "¿Deseas jugar de nuevo, "+name+"?", "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        /**
+         * yes = 0
+         * no = 1
+         */
         if(reset == 0){
             resetGame();
         }
