@@ -1,6 +1,6 @@
 import java.io.*;
 
-public interface Jugador{
+public interface Player{
     public void playGame() throws IOException;
     public void resetGame() throws IOException;
 }
