@@ -3,4 +3,5 @@
 *.class
 *.exe
 *.out
+*.dia
 *.o

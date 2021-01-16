@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  2,0 | 2,1 | 2,2
  */
 
-public class Client extends JFrame implements ActionListener{
+public class Client extends JFrame implements ActionListener,Jugador{
 
     // ip, nombre_jugador, (X,O), coordenadas
     private String host, name, mark, tiro;
@@ -103,6 +103,7 @@ public class Client extends JFrame implements ActionListener{
         cp.add(panel,BorderLayout.CENTER);
     }
 
+    @Override
     public void resetGame(){
         try{
             sc = new Socket(host,port); //Socket para el cliente
@@ -113,13 +114,14 @@ public class Client extends JFrame implements ActionListener{
                 b.setForeground(Color.black);   // Volverlo a poner de negro
             }
             l00.setText("espera tu turno"); // Espere el turno
-            runClient();
+            playGame();
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
     }
 
-    public void runClient() throws IOException{
+    @Override
+    public void playGame() throws IOException{
         boolean go = true;
         int reset = -1;
         mark = "";
@@ -251,6 +253,6 @@ public class Client extends JFrame implements ActionListener{
     public static void main(String[] args)  throws IOException{
         Client c = new Client();
         c.init();
-        c.runClient();
+        c.playGame();
     }
 }
