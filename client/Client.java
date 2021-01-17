@@ -26,6 +26,7 @@ public class Client extends JFrame implements ActionListener, Player{
     private GridLayout gl;  // Hacer malla en la interfaz
     private JLabel l00;     // Informar si es turno del jugador
     private boolean turno = false;  // Si es el turno del jugador
+    private Color myMark, otMark;
     /**
      * Estructura del tablero
      * {
@@ -60,6 +61,8 @@ public class Client extends JFrame implements ActionListener, Player{
             table = new HashMap<String,JButton>();
             // Pido el nombre que quiere usar el cliente
             name = JOptionPane.showInputDialog(null, "Ingrese su nombre", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+            myMark = Color.RED;
+            otMark = Color.BLACK;
             initGUI();
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -73,13 +76,20 @@ public class Client extends JFrame implements ActionListener, Player{
     }
 
     public void crearBarra(){
+        GridLayout gridLay = new GridLayout(2,1);  // Divisiones de la interfaz
         JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-        panel.add(new JLabel(name));    // Label nombre
+        panel.setLayout(gridLay);
+
+        JPanel barra = new JPanel();
+        barra.setLayout(new FlowLayout());
+        barra.add(new JLabel(name));    // Label nombre
         l00 = new JLabel("espera tu turno");    // Label del turno
-        panel.add(l00);
+        barra.add(l00);
+
         darkMode = new JCheckBox("Modo Obscuro");
         darkMode.addActionListener(this);
+
+        panel.add(barra);
         panel.add(darkMode);
         cp.add(panel,BorderLayout.NORTH);
     }
@@ -213,6 +223,8 @@ public class Client extends JFrame implements ActionListener, Player{
     }
 
     private void changeModeColor(Color btn, Color mineMark, Color markC){   // Cambia el color de los botones
+        myMark = mineMark;  // Color del texto del jugador
+        otMark = markC;     // Color del texto del contrincante
         for(String key : table.keySet()){
             JButton b = table.get(key); // Obtener el boton el tablero
             b.setBackground(btn);           // Color del fondo del boton
@@ -230,7 +242,7 @@ public class Client extends JFrame implements ActionListener, Player{
 
         if(e.getSource() == darkMode){
             if(darkMode.isSelected()){
-                changeModeColor(Color.DARK_GRAY, new Color(114,70,124), Color.WHITE);
+                changeModeColor(Color.DARK_GRAY, new Color(102,155,247), Color.WHITE);
             }else{
                 changeModeColor(null, Color.RED, Color.BLACK);
             }
@@ -240,7 +252,7 @@ public class Client extends JFrame implements ActionListener, Player{
                 JButton b = table.get(tiro);    // Obtener el boton de dicha coordenada
                 if(!ocupado(b.getText())){
                     b.setText(mark);    // Darle el simbolo del jugador (X,O)
-                    b.setForeground(Color.RED); // Cambiar color
+                    b.setForeground(myMark); // Cambiar color
                     msgOut.println(tiro);   // Mandar al servidor coordenadas
                     turno = false;  // Desocupar el turno
                 }else{
@@ -259,6 +271,7 @@ public class Client extends JFrame implements ActionListener, Player{
             String c = msgIn.readLine();    // Coordeanda
             JButton b = table.get(c);   // Obtengo el boton del a coordena 'c'
             b.setText(m);   // Edito el texto del boton con la marca del contrincante
+            b.setForeground(otMark);
         } catch (Exception e) {
             System.out.println(e);
         }
