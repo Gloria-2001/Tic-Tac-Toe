@@ -9,6 +9,11 @@ public class TicTacToe {
     private String lastMark = "", coord = "";
     private boolean firstTime = true, tie = false;
 
+    public String getWinner(){
+        if(winner == null) return "none";
+        return winner.getName();
+    }
+
     public String printBoard(){
         String strBoard = "  ";
         

@@ -9,6 +9,7 @@ public class PlayerThread extends Thread{
     private char symbol;
     private TicTacToe game;
     private boolean conti = false;
+    private String winner;
 
     public PlayerThread(Socket s, char sig, String n){
         super(n);
@@ -49,6 +50,10 @@ public class PlayerThread extends Thread{
         return symbol;
     }
 
+    public String getWinner(){
+        return winner;
+    }
+
     @Override
     public void run(){
         while(!conti){
@@ -57,6 +62,11 @@ public class PlayerThread extends Thread{
             } catch (Exception e) {
                 System.out.println(e);
             }
+        }
+        if(!game.getWinner().equals("none")){
+            winner = game.getWinner();
+        }else{
+            winner = "Empate";
         }
     }
 }

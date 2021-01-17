@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  2,0 | 2,1 | 2,2
  */
 
-public class Client extends JFrame implements ActionListener,Player{
+public class Client extends JFrame implements ActionListener, Player{
 
     // ip, nombre_jugador, (X,O), coordenadas
     private String host, name, mark, tiro;
@@ -251,7 +251,8 @@ public class Client extends JFrame implements ActionListener,Player{
     }
 
     public static void main(String[] args)  throws IOException{
-        Client c = new Client();
+        Client c;
+        c = new Client();
         c.init();
         c.playGame();
     }

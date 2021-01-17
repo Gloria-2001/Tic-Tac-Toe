@@ -1,8 +1,9 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.time.*;
 
-public class Server{
+public class Server extends Document{
     private int port;
     private ServerSocket ss;
     private Socket sc;
@@ -12,14 +13,17 @@ public class Server{
     private ArrayList<PlayerThread> players;
     private Stack<PlayerThread> playRemove;
     private char []symbol = {'X','O'};
+    private String winner;
 
     public Server(){
+        super("registro.txt");
         port = 1234;
         players = new ArrayList<PlayerThread>();
         playRemove = new Stack<PlayerThread>();
     }
 
     public Server(int p){
+        super("registro.txt");
         port = p;
         players = new ArrayList<PlayerThread>();
     }
@@ -36,6 +40,10 @@ public class Server{
 
     public void initGame() throws IOException{
         TicTacToe g = new TicTacToe();
+        LocalDate day = LocalDate.now(); // Create a date object
+        LocalTime startTime = LocalTime.now();
+        LocalTime endTime;
+
         for(PlayerThread hj : players){
             hj.initPlayer(g);
             hj.sendSymbol();
@@ -46,6 +54,7 @@ public class Server{
         while(true){
             for(PlayerThread hj : players){
                 if(!hj.isAlive()){
+                    this.winner = hj.getWinner();
                     playRemove.push(hj);
                 }
             }
@@ -57,13 +66,16 @@ public class Server{
             if(players.isEmpty()){
                 numPlayers = 0;
                 System.out.println("Pueden ingresar nuevos jugadores");
+                endTime = LocalTime.now();
                 break;
             }
         }
+
+        writeFile(day+" - "+startTime+" - "+endTime+" - "+this.winner);
     }
 
     public void listen() throws IOException{
-        System.out.println("Esperando jugadores");
+        System.out.println("Esperando jugadores en el puerto "+port);
         try {
             while(true){
                 // Wait a response from the client
@@ -101,7 +113,12 @@ public class Server{
     }
 
     public static void main(String[] args) throws IOException{
-        Server s = new Server();
+        Server s;
+        if(args.length == 1){
+            s = new Server(Integer.parseInt(args[0]));
+        }else{
+            s = new Server();
+        }
         s.init();
         s.listen();
         s.close();
