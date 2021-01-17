@@ -22,8 +22,8 @@ public class Server extends Document{
         playRemove = new Stack<PlayerThread>();
     }
 
-    public Server(int p){
-        super("registro.txt");
+    public Server(int p, String nameFile){
+        super(nameFile);
         port = p;
         players = new ArrayList<PlayerThread>();
     }
@@ -114,11 +114,27 @@ public class Server extends Document{
 
     public static void main(String[] args) throws IOException{
         Server s;
-        if(args.length == 1){
-            s = new Server(Integer.parseInt(args[0]));
+        int portMain = 1234, data = args.length;
+        String outFile = "registro.txt";
+
+        if(args.length > 0){
+            for(int i=0; i<data; i++){
+                switch (args[i]){
+                    case "-p":  // port
+                        i++;
+                        portMain = Integer.parseInt(args[i]);
+                    break;
+                    case "-o":  // output
+                        i++;
+                        outFile = args[i];
+                    break;
+                }
+            }
+            s = new Server(portMain,outFile);
         }else{
             s = new Server();
         }
+        
         s.init();
         s.listen();
         s.close();

@@ -43,13 +43,6 @@ public class Client extends JFrame implements ActionListener, Player{
         host = "localhost";     // ip local = 127.0.0.1
     }
 
-    public Client(int p){
-        super("Tic Tac Toe");
-        this.setSize(450,450);
-        port = p;
-        host = "localhost";
-    }
-
     public Client(String h, int p){
         super("Tic Tac Toe");
         this.setSize(450,450);
@@ -252,7 +245,25 @@ public class Client extends JFrame implements ActionListener, Player{
 
     public static void main(String[] args)  throws IOException{
         Client c;
-        c = new Client();
+        String hostMain = "localhost";
+        int portMain = 1234, data = args.length;
+        if(data > 0){
+            for(int i=0; i<data; i++){
+                switch (args[i]){
+                    case "-p":  // port
+                        i++;
+                        portMain = Integer.parseInt(args[i]);
+                    break;
+                    case "-h":  // hostname o IP
+                        i++;
+                        hostMain = args[i];
+                    break;
+                }
+            }
+            c = new Client(hostMain, portMain);
+        }else{
+            c = new Client();
+        }
         c.init();
         c.playGame();
     }
