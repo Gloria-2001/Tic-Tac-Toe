@@ -34,6 +34,7 @@ public class Client extends JFrame implements ActionListener, Player{
      * }
      */
     private HashMap<String, JButton> table; // Tablero
+    private JCheckBox darkMode;
 
 
     public Client(){
@@ -77,6 +78,9 @@ public class Client extends JFrame implements ActionListener, Player{
         panel.add(new JLabel(name));    // Label nombre
         l00 = new JLabel("espera tu turno");    // Label del turno
         panel.add(l00);
+        darkMode = new JCheckBox("Modo Obscuro");
+        darkMode.addActionListener(this);
+        panel.add(darkMode);
         cp.add(panel,BorderLayout.NORTH);
     }
 
@@ -167,7 +171,7 @@ public class Client extends JFrame implements ActionListener, Player{
                         lastMark(); // Obtener la tirada del turno anterior 
                     break;
                     case "tie":     // Menciona que es un empate
-                        JOptionPane.showMessageDialog(null, "Es un empate", "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Es un empate, "+name, "Tic Tac Toe", JOptionPane.WARNING_MESSAGE);
                     break;
                     case "win":     // Menciona que el jugador ha ganado
                         JOptionPane.showMessageDialog(null, "Felicidades "+name+".\n¡Haz ganado!", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
@@ -198,7 +202,7 @@ public class Client extends JFrame implements ActionListener, Player{
         if(reset == 0){
             resetGame();
         }
-        JOptionPane.showMessageDialog(null, "Fin del juego.\nHasta pronto.", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Fin del juego.\nHasta pronto "+name+".", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
         System.exit(0);
     }
 
@@ -208,22 +212,43 @@ public class Client extends JFrame implements ActionListener, Player{
         return false;
     }
 
+    private void changeModeColor(Color btn, Color mineMark, Color markC){   // Cambia el color de los botones
+        for(String key : table.keySet()){
+            JButton b = table.get(key); // Obtener el boton el tablero
+            b.setBackground(btn);           // Color del fondo del boton
+            if(b.getText().equals(mark)){   // Color del texto
+                b.setForeground(mineMark);
+            }else{
+                b.setForeground(markC);
+            }
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e){
         // e.getSource() se compara con la instancia de la clase
-        if(turno){
-            tiro = e.getActionCommand();    // Recibo una coordenada
-            JButton b = table.get(tiro);    // Obtener el boton de dicha coordenada
-            if(!ocupado(b.getText())){
-                b.setText(mark);    // Darle el simbolo del jugador (X,O)
-                b.setForeground(Color.red); // Cambiar color
-                msgOut.println(tiro);   // Mandar al servidor coordenadas
-                turno = false;  // Desocupar el turno
+
+        if(e.getSource() == darkMode){
+            if(darkMode.isSelected()){
+                changeModeColor(Color.DARK_GRAY, new Color(114,70,124), Color.WHITE);
             }else{
-                JOptionPane.showMessageDialog(null, "Lugar ocupado, seleccione otro", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                changeModeColor(null, Color.RED, Color.BLACK);
             }
         }else{
-            JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+            if(turno){
+                tiro = e.getActionCommand();    // Recibo una coordenada
+                JButton b = table.get(tiro);    // Obtener el boton de dicha coordenada
+                if(!ocupado(b.getText())){
+                    b.setText(mark);    // Darle el simbolo del jugador (X,O)
+                    b.setForeground(Color.RED); // Cambiar color
+                    msgOut.println(tiro);   // Mandar al servidor coordenadas
+                    turno = false;  // Desocupar el turno
+                }else{
+                    JOptionPane.showMessageDialog(null, "Lugar ocupado, seleccione otro", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }else{
+                JOptionPane.showMessageDialog(null, "No es su turno, por favor espere", "Tic Tac Toe", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
