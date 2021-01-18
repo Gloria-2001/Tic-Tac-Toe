@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.time.*;
+import java.lang.*;
 
 public class Server extends Document{
     private int port;   // Puerto
@@ -61,7 +62,7 @@ public class Server extends Document{
             }
             
             while(!playRemove.empty()){
-                players.remove(playRemove.pop());   // Remover de la pista y la lista
+                players.remove(playRemove.pop());   // Remover de la pila y la lista
             }
 
             if(players.isEmpty()){  // Si ambos usuario se desconectaron

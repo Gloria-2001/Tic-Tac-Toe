@@ -252,7 +252,7 @@ public class Client extends JFrame implements ActionListener, Player{
                 JButton b = table.get(tiro);    // Obtener el boton de dicha coordenada
                 if(!ocupado(b.getText())){
                     b.setText(mark);    // Darle el simbolo del jugador (X,O)
-                    b.setForeground(myMark); // Cambiar color
+                    b.setForeground(myMark); // Cambiar color de la letra
                     msgOut.println(tiro);   // Mandar al servidor coordenadas
                     turno = false;  // Desocupar el turno
                 }else{
@@ -271,7 +271,7 @@ public class Client extends JFrame implements ActionListener, Player{
             String c = msgIn.readLine();    // Coordeanda
             JButton b = table.get(c);   // Obtengo el boton del a coordena 'c'
             b.setText(m);   // Edito el texto del boton con la marca del contrincante
-            b.setForeground(otMark);
+            b.setForeground(otMark);    // Cambia color de la letra
         } catch (Exception e) {
             System.out.println(e);
         }
