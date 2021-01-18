@@ -190,6 +190,11 @@ public class Client extends JFrame implements ActionListener, Player{
                         linea = msgIn.readLine(); // Nombre del ganador
                         JOptionPane.showMessageDialog(null, "Lo sentimos.\n"+linea+" ha ganado.", "Tic Tac Toe", JOptionPane.ERROR_MESSAGE);
                     break;
+                    case "no-con":
+                        JOptionPane.showMessageDialog(null, "Lo sentimos, "+name+". Ya hay personas jugando\nIntentelo mas tarde ", "Tic Tac Toe", JOptionPane.ERROR_MESSAGE);
+                        close();
+                        System.exit(0);
+                    break;
                     default:
                         // Respuesta del servidor
                         System.out.println(linea);
@@ -200,9 +205,6 @@ public class Client extends JFrame implements ActionListener, Player{
             System.out.println("IOException: " + e.getMessage());
         }
 
-        // Libera recursos
-        msgOut.close(); // Cerrar canales
-        msgIn.close();
         close();
         reset = JOptionPane.showConfirmDialog(null, "¿Deseas jugar de nuevo, "+name+"?", "Tic Tac Toe", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         /**
@@ -278,6 +280,9 @@ public class Client extends JFrame implements ActionListener, Player{
     }
 
     public void close() throws IOException{ // Cerrar la conexion
+        // Libera recursos
+        msgOut.close(); // Cerrar canales
+        msgIn.close();
         sc.close();
     }
 
