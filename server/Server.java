@@ -4,16 +4,16 @@ import java.util.*;
 import java.time.*;
 
 public class Server extends Document{
-    private int port;
-    private ServerSocket ss;
-    private Socket sc;
-    private BufferedReader msgIn;
-    private PrintWriter msgOut;
-    private int numPlayers = 0;
-    private ArrayList<PlayerThread> players;
-    private Stack<PlayerThread> playRemove;
-    private char []symbol = {'X','O'};
-    private String winner;
+    private int port;   // Puerto
+    private ServerSocket ss;    // Socket servidor
+    private Socket sc;          // Socket para clientes
+    private BufferedReader msgIn;   // Canal de entrada
+    private PrintWriter msgOut;     // Canal de salida
+    private int numPlayers = 0;     // Numero de jugadores
+    private ArrayList<PlayerThread> players;    // Jugadores conectados
+    private Stack<PlayerThread> playRemove;     // Jugadores a borrar
+    private char []symbol = {'X','O'};          // Marcas disponibles
+    private String winner;          // Nombre del ganador
 
     public Server(){
         super("registro.txt");
@@ -26,6 +26,7 @@ public class Server extends Document{
         super(nameFile);
         port = p;
         players = new ArrayList<PlayerThread>();
+        playRemove = new Stack<PlayerThread>();
     }
 
     public void init(){
@@ -39,65 +40,65 @@ public class Server extends Document{
     }
 
     public void initGame() throws IOException{
-        TicTacToe g = new TicTacToe();
-        LocalDate day = LocalDate.now(); // Create a date object
-        LocalTime startTime = LocalTime.now();
-        LocalTime endTime;
+        TicTacToe g = new TicTacToe();  // Crea un objeto TicTacToe
+        LocalDate day = LocalDate.now(); // Crea objeto date
+        LocalTime startTime = LocalTime.now();  // Crea objeto de hora de inicio
+        LocalTime endTime;  // Crea objeto de hora de fin
 
-        for(PlayerThread hj : players){
-            hj.initPlayer(g);
-            hj.sendSymbol();
-            hj.sendMsg("play");
-            hj.start();
+        for(PlayerThread hj : players){ // Para todos los jugadores conectados
+            hj.initPlayer(g);           // Inicia un jugador
+            hj.sendSymbol();            // Manda su marca
+            hj.sendMsg("play");         // Indica que puede jugar
+            hj.start();                 // Inicia el juego para ambos jugadores
         }
 
         while(true){
-            for(PlayerThread hj : players){
-                if(!hj.isAlive()){
-                    this.winner = hj.getWinner();
-                    playRemove.push(hj);
+            for(PlayerThread hj : players){ // Para cada jugador
+                if(!hj.isAlive()){          // Esta vivo?
+                    this.winner = hj.getWinner();   // Obtener ganador
+                    playRemove.push(hj);            // Agregar a la pila para removerlos de la lista
                 }
             }
             
             while(!playRemove.empty()){
-                players.remove(playRemove.pop());
+                players.remove(playRemove.pop());   // Remover de la pista y la lista
             }
 
-            if(players.isEmpty()){
+            if(players.isEmpty()){  // Si ambos usuario se desconectaron
                 numPlayers = 0;
                 System.out.println("Pueden ingresar nuevos jugadores");
-                endTime = LocalTime.now();
+                endTime = LocalTime.now();  // Se pone el valor de la hora
                 break;
             }
         }
 
-        writeFile(day+" - "+startTime+" - "+endTime+" - "+this.winner);
+        writeFile(day+" - "+startTime+" - "+endTime+" - "+this.winner); // Se escribe en el archivo
     }
 
     public void listen() throws IOException{
         System.out.println("Esperando jugadores en el puerto "+port);
         try {
             while(true){
-                // Wait a response from the client
+                // espera una peticion del cliente
                 sc = ss.accept();
                 System.out.println("Conexion aceptada: "+ sc);
-                // Create an out buffer
+                // Crea un buffer de entrada y salida para el cliente aceptado
                 msgOut = new PrintWriter(new BufferedWriter(
                     new OutputStreamWriter(
                     sc.getOutputStream())),true);
                 msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
-                if(numPlayers >= 2){
-                    msgOut.println("Suficientes jugadores en el juego");
+                if(numPlayers >= 2){    // Si el numero de conexiones es mayor a dos
+                    msgOut.println("Suficientes jugadores en el juego");    // Rechaza al cliente entrante
                     msgOut.println("exit");
                 }else{
-                    msgOut.println("name");
-                    String name = msgIn.readLine();
-                    players.add(new PlayerThread(sc,symbol[numPlayers],name));
+                    msgOut.println("name"); // Pide nombre
+                    String name = msgIn.readLine(); // Espera la lectura del nombre
+                    players.add(new PlayerThread(sc,symbol[numPlayers],name));  // Crea un jugador
                     numPlayers++;
-                    if(numPlayers == 1){
+                    if(numPlayers == 1){    // Si es un jugador, debe esperar al otro
                         msgOut.println("w00");
                     }
-                    if(numPlayers == 2) initGame();
+                    if(numPlayers == 2) initGame(); // Si son dos, que inicie el juego
                 }
             }
         } catch (IOException e) {
@@ -107,7 +108,7 @@ public class Server extends Document{
         msgIn.close();
     }
 
-    public void close() throws IOException{
+    public void close() throws IOException{ // Cierra la conexion
         sc.close();
         ss.close();
     }
