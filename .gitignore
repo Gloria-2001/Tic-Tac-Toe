@@ -3,6 +3,6 @@
 *.class
 *.exe
 *.out
-*.dia
+*.mdj
 *.txt
 *.o
