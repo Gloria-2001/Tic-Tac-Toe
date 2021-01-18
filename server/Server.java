@@ -2,7 +2,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.time.*;
-import java.lang.*;
 
 public class Server extends Document{
     private int port;   // Puerto
@@ -89,8 +88,7 @@ public class Server extends Document{
                     sc.getOutputStream())),true);
                 msgIn = new BufferedReader(new InputStreamReader(sc.getInputStream()));
                 if(numPlayers >= 2){    // Si el numero de conexiones es mayor a dos
-                    msgOut.println("Suficientes jugadores en el juego");    // Rechaza al cliente entrante
-                    msgOut.println("exit");
+                    msgOut.println("no-con");   // Rechaza al cliente entrante
                 }else{
                     msgOut.println("name"); // Pide nombre
                     String name = msgIn.readLine(); // Espera la lectura del nombre

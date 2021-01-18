@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class Document{
+public abstract class Document{
     private File doc;
 
     public Document(String name){
